@@ -34,7 +34,7 @@ if Chef::Config[:solo]
       :ldap_server => {
         :fqdn => "#{node['prosody']['ldap']['fqdn']}",
         :openldap => {
-          :users_root => "#{node['prosody']['ldap']['basedn'}",
+          :users_root => "#{node['prosody']['ldap']['basedn']}",
           :anon_binddn => "#{node['prosody']['ldap']['rootdn']}",
           :anon_pass => "#{node['prosody']['ldap']['rootpw']}"
         }
