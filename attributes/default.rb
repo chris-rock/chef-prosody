@@ -89,3 +89,9 @@ default['prosody']['modules_enabled'] = %w( roster saslauth tls dialback disco
 default['ssl']['country'] = 'NL'
 default['ssl']['state'] = 'NH'
 default['ssl']['city'] = 'AMS'
+
+# ldap configuration for chef solo
+default['prosody']['ldap']['fqdn'] = "ldap.localdomain"
+default['prosody']['ldap']['basedn'] = "dc=localdomain"
+default['prosody']['ldap']['rootdn'] = "cn=admin, dc=localdomain"
+default['prosody']['ldap']['rootpw'] = nil

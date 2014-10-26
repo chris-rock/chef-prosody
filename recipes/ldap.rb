@@ -17,10 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-if Chef::Config[:solo]
-  Chef::Log.warn("This recipe uses search. Chef Solo does not support search.")
-  return
-end
 
 Chef::Log.info "preparing for ldap"
 package "lua-ldap"
@@ -30,10 +26,34 @@ template ::File.join(node['prosody']['plugin_dir'], "mod_auth_ldap.lua") do
   notifies :restart, "service[prosody]"
 end
 
-template ::File.join(node['prosody']['conf_d_dir'], "auth_ldap.cfg.lua") do
-  mode 0644
-  variables(
-    :ldap_server => search(:node, "recipes:openldap\\:\\:users && domain:#{node['domain']}").first
-  )
-  notifies :restart, "service[prosody]"
+if Chef::Config[:solo]
+
+  template ::File.join(node['prosody']['conf_d_dir'], "auth_ldap.cfg.lua") do
+    mode 0644
+    variables(
+      :ldap_server => {
+        :fqdn => "#{node['prosody']['ldap']['fqdn']}",
+        :openldap => {
+          :users_root => "#{node['prosody']['ldap']['basedn'}",
+          :anon_binddn => "#{node['prosody']['ldap']['rootdn']}",
+          :anon_pass => "#{node['prosody']['ldap']['rootpw']}"
+        }
+      }
+    )
+    notifies :restart, "service[prosody]"
+  end
+else
+  # Chef Server
+  template ::File.join(node['prosody']['conf_d_dir'], "auth_ldap.cfg.lua") do
+    mode 0644
+    variables(
+      :ldap_server => search(:node, "recipes:openldap\\:\\:users && domain:#{node['domain']}").first
+    )
+    notifies :restart, "service[prosody]"
+  end
+
 end
+
+
+
+
