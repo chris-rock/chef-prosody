@@ -28,17 +28,16 @@ end
 
 if Chef::Config[:solo]
 
+  params['fqdn'] = "#{node['prosody']['ldap']['fqdn']}"
+  params['openldap'] = {}
+  params['openldap']['users_root'] = "#{node['prosody']['ldap']['basedn']}"
+  params['openldap']['anon_binddn'] = "#{node['prosody']['ldap']['rootdn']}"
+  params['openldap']['anon_pass'] = "#{node['prosody']['ldap']['rootpw']}"
+
   template ::File.join(node['prosody']['conf_d_dir'], "auth_ldap.cfg.lua") do
     mode 0644
     variables(
-      :ldap_server => {
-        :fqdn => "#{node['prosody']['ldap']['fqdn']}",
-        :openldap => {
-          :users_root => "#{node['prosody']['ldap']['basedn']}",
-          :anon_binddn => "#{node['prosody']['ldap']['rootdn']}",
-          :anon_pass => "#{node['prosody']['ldap']['rootpw']}"
-        }
-      }
+      :ldap_server => params
     )
     notifies :restart, "service[prosody]"
   end
